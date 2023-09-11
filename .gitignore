@@ -1,4 +1,2 @@
 /node_modules/
-/luxon.min.js
-/workflow-runs.json
-/workflow-runs.html
+/build/

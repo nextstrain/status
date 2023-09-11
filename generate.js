@@ -8,7 +8,7 @@ import html from "./html.js";
 
 // Read data files
 const baseDir = path.dirname(process.argv[1]);
-const workflowRuns = JSON.parse(fs.readFileSync(path.join(baseDir, "workflow-runs.json"), "utf-8"));
+const workflowRuns = JSON.parse(fs.readFileSync(path.join(baseDir, "build/workflow-runs.json"), "utf-8"));
 
 const runsByRepoAndWorkflow =
   groups(

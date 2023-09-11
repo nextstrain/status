@@ -1,13 +1,21 @@
 SHELL := bash -euo pipefail
 
-.PHONY: workflow-runs.html
+build := build
+
+.PHONY: index.html
 .DELETE_ON_ERROR:
 
-workflow-runs.html: workflow-runs.json luxon.min.js
+$(build)/workflow-runs.html: $(build)/workflow-runs.json $(build)/workflow-runs.css $(build)/workflow-runs.js $(build)/luxon.min.js | $(build)
 	./generate.js > $@
 
-workflow-runs.json: %.json: %.sql
+$(build)/workflow-runs.json: $(build)/%.json: %.sql | $(build)
 	steampipe query --output json $< > $@
 
-luxon.min.js: node_modules/luxon/build/global/luxon.min.js
+$(build)/workflow-runs.%: workflow-runs.% | $(build)
 	cp $< $@
+
+$(build)/luxon.min.js: node_modules/luxon/build/global/luxon.min.js | $(build)
+	cp $< $@
+
+$(build):
+	mkdir -p $(build)
