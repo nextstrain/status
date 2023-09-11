@@ -1,0 +1,3 @@
+write up why this design
+    why not webhooks/event sourcing/local database
+    why not API directly?
