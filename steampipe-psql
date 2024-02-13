@@ -1,0 +1,64 @@
+#!/bin/bash
+# usage: steampipe-psql [psql-options]
+#        steampipe-psql --help
+#
+# Run psql with provided arguments against a local Steampipe Postgres service.
+#
+# If the local Steampipe Postgres service isn't already running, it's
+# automatically started before running psql and automatically stopped
+# afterwards.
+#
+# All non-psql output is carefully sent to stderr so you may use stdout for
+# results from psql.
+#
+set -euo pipefail
+
+export PGHOST="${PGHOST:-localhost}"
+export PGPORT="${PGPORT:-9193}"
+export PGUSER="${PGUSER:-steampipe}"
+export PGDATABASE="${PGDATABASE:-steampipe}"
+
+main() {
+    print-help-if-requested "$@"
+
+    echo "Using PGHOST=$PGHOST PGPORT=$PGPORT PGUSER=$PGUSER PGDATABASE=$PGDATABASE" >&2
+
+    if ! steampipe-service-available; then
+        echo "Steampipe Postgres service not available; starting it…" >&2
+
+        if [[ "$PGHOST" != localhost ]]; then
+            echo "Cannot automatically start Steampipe Postgres service for host $PGHOST" >&2
+            exit 1
+        fi
+
+        steampipe service start \
+            --database-listen local \
+            --database-port "$PGPORT" \
+            >&2
+
+        # Stop the service when we exit, i.e. leave it in the same state as
+        # when we started.
+        trap '
+            echo "Stopping Steampipe Postgres service…" >&2
+            steampipe service stop >&2
+        ' EXIT
+    fi
+
+    echo "Running psql" >&2
+
+    # No exec because of our trap above
+    psql "$@"
+}
+
+print-help-if-requested() {
+    if [[ "${1:-}" == --help ]]; then
+        sed -nE '/^#/!q; s/^#( |$)//p;' "$0"
+        exit
+    fi
+}
+
+steampipe-service-available() {
+    nc -zw3 "$PGHOST" "$PGPORT" &>/dev/null
+}
+
+main "$@"

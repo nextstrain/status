@@ -110,7 +110,7 @@ run as materialized (
 )
 
 select
-    *
+    json_agg(row_to_json(run))
 from
     run
 where

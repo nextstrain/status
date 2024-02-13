@@ -10,7 +10,7 @@ $(build)/pathogen-workflows.html: $(build)/pathogen-workflows.json $(build)/path
 	./pathogen-workflows.html.js < $< > $@
 
 $(build)/pathogen-workflows.json: $(build)/%.json: %.sql | $(build)
-	steampipe query --output json $< > $@
+	./steampipe-psql --quiet --no-psqlrc --no-align --tuples-only --set=ON_ERROR_STOP= < $< > $@
 
 copied := \
 	$(build)/pathogen-workflows.css \
