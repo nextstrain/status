@@ -32,3 +32,6 @@ node_modules:
 
 $(build):
 	mkdir -p $(build)
+
+download: | $(build)
+	curl -fsSL --proto '=https' https://nextstrain.github.io/status/pathogen-workflows.json > $(build)/pathogen-workflows.json
