@@ -113,6 +113,7 @@ run as materialized (
             -- XXX FIXME: this correlated subquery is a hack around a steampipe issue… describe why, maybe explore a better work around.
             head_branch = (select default_branch from repository r where r.repository_full_name = workflow.repository_full_name)
         and age(run.created_at) <= '90 days'
+        and run.created_at >= '2024-02-13T21:50:28Z'::timestamptz -- When I merged <https://github.com/nextstrain/.github/pull/54>. —trs
 )
 
 select
