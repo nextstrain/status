@@ -44,6 +44,13 @@ main() {
         ' EXIT
     fi
 
+    # Steampipe is sometimes slow about registering schemas for plugins and if
+    # we try to run a query before they exist it'll fail.
+    while ! steampipe-plugins-ready; do
+        echo "Waiting for Steampipe plugin schemas to be ready…" >&2
+        sleep 1
+    done
+
     echo "Running psql" >&2
 
     # No exec because of our trap above
@@ -59,6 +66,16 @@ print-help-if-requested() {
 
 steampipe-service-available() {
     nc -zw3 "$PGHOST" "$PGPORT" &>/dev/null
+}
+
+steampipe-plugins-ready() {
+    local -a psql=(psql --quiet --no-psqlrc --no-align --tuples-only)
+    local query="
+        select count(*)
+          from steampipe_internal.steampipe_connection
+         where type = 'plugin' and state != 'ready'
+    "
+    [[ "$("${psql[@]}" <<<"$query")" -eq 0 ]]
 }
 
 main "$@"
