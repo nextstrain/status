@@ -56,11 +56,14 @@ window.addEventListener("popstate", (event) => {
 });
 
 
-/* Gracefully upgrade datetimes to user's local time
+/* Gracefully upgrade datetimes to user's local time and ISO durations to
+ * user-friendly descriptions.
  */
 for (const time of document.getElementsByTagName("time")) {
   if (time.dateTime === time.textContent) {
-    time.textContent = new Date(time.dateTime);
+    time.textContent = time.dateTime.startsWith("P")
+      ? luxon.Duration.fromISO(time.dateTime).toHuman()
+      : new Date(time.dateTime);
   }
 }
 

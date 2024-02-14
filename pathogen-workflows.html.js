@@ -72,6 +72,7 @@ process.stdout.write(String(html`
                       <summary>${indicator(run)}</summary>
                       <div>
                         <time datetime="${run.created_at}">${run.created_at}</time>
+                        <time datetime="${run.duration}">${run.duration}</time>
                         <a href="${run.html_url}">run details</a>
                         <code>${run.event}</code>
                         <code>${run.commit_id.slice(0, 8)}</code>

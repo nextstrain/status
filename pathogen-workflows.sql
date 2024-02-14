@@ -12,6 +12,7 @@
  * legwork to get their status.
  *   -trs, 8 Sept 2023
  */
+set intervalstyle = 'iso_8601';
 
 with
 
@@ -86,8 +87,13 @@ run as materialized (
         run.id                          as id,
         run.html_url,
         run.created_at,
+        run.updated_at,
         run.conclusion,
         run.status,
+        case when run.conclusion is not null
+            then run.updated_at - run.created_at
+            else current_timestamp(0) - run.created_at
+        end                             as duration,
         run.event,
         run.head_sha                    as commit_id,
         run.head_commit->>'message'     as commit_msg,
