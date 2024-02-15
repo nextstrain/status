@@ -53,7 +53,7 @@ approach.  The separation of data generation from data presentation is nice as
 it does allow for other generation approaches without affecting presentation.
 
 _What might be an alternate approach?_
-GitHub webhooks received by a tiny app on Heroku (or
+GitHub [`workflow_run` webhooks][] received by a tiny app on Heroku (or
 Fly.io/Netlify/Render/whatever) that records the webhook payloads in a local
 database (e.g. SQLite or maybe PostgreSQL).  Dynamically rendered status pages.
 This provides very up-to-date information without polling, though introduces
@@ -61,3 +61,5 @@ significant possibility for error/inconsistency due to missed webhook
 deliveries and drift.  So we'd probably want to supplement the webhook data
 with regularly polls for new data, e.g. by querying Steampipe and backfilling
 the local database where necessary such that we're eventually consistent.
+
+[`workflow_run` webhooks]: https://docs.github.com/en/webhooks/webhook-events-and-payloads#workflow_run
