@@ -92,7 +92,9 @@ ol > li.cancelled {
   background: var(--background-cancelled);
 }
 ol > li > details > summary {
-  /* Remove default triangle bullet */
+  /* Remove default triangle bullet, per spec.
+   * <https://developer.mozilla.org/en-US/docs/Web/HTML/Element/summary#default_style>
+   */
   list-style: none;
 
   /* Fill containing <li> */
@@ -111,6 +113,12 @@ ol > li > details > summary {
   box-sizing: border-box;
   border: 1px solid transparent;
   border-right: 1px solid white;
+}
+ol > li > details > summary::-webkit-details-marker {
+  /* Remove default triangle bullet on Apple WebKit (Safari on macOS or any
+   * browser on iOS)
+   */
+  display: none;
 }
 ol > li.success > details > summary {
   color: var(--color-success);
