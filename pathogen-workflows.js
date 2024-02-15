@@ -1,6 +1,30 @@
 /* Client-side JavaScript for the pathogen workflow status page.
  */
 
+
+/* Automatically refresh the page as long as no run details are open.
+ *
+ * We don't use <meta name="refresh" …> because we want to check for open
+ * details panels.
+ *
+ * Browsers should maintain page scroll position when doing this kind of
+ * refresh (and in testing Firefox does).
+ */
+const REFRESH_SECONDS = 60; // seconds
+
+function refreshIfAppropriate() {
+  if (document.querySelectorAll("details[open]").length) {
+    console.log("<details> are open… delaying refresh for another minute");
+    setTimeout(refreshIfAppropriate, REFRESH_SECONDS * 1000);
+    return;
+  }
+  console.log("Refreshing…");
+  document.location.reload();
+}
+
+setTimeout(refreshIfAppropriate, REFRESH_SECONDS * 1000);
+
+
 /* Set query params as data-* attributes on the document so CSS can use them.
  * We do this at several possible points in time.
  */
