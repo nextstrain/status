@@ -6,6 +6,12 @@
  * @module html
  */
 
+/* If we start being limited by this, switch to Observable's much more feature
+ * rich version of this idea: Hypertext Literal.
+ * <https://github.com/observablehq/htl>
+ *   -trs, 15 Feb 2024
+ */
+
 class LiteralHTML extends String {}
 
 export default function html(literalParts, ...exprParts) {
