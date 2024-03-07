@@ -20,7 +20,7 @@ jobs:
     steps:
       - name: Install Steampipe
         run: |
-          sudo /bin/sh -c "$(curl -fsSL https://raw.githubusercontent.com/turbot/steampipe/HEAD/install.sh)"
+          sudo /bin/sh -c "$(curl -fsSL https://steampipe.io/install/steampipe.sh)"
           steampipe --version
           steampipe plugin install github
           steampipe plugin install net
