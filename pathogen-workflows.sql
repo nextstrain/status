@@ -108,28 +108,39 @@ run as materialized (
         run.head_sha                    as commit_id,
         run.head_commit->>'message'     as commit_msg,
 
-        row_number() over (
-            partition by
-                repository_full_name,
-                workflow_id
-            order by run_number desc
-        ) as relative_workflow_run_number
+        -- XXX FIXME: this correlated subquery is a hack around a steampipe issue… describe why, maybe explore a better work around.
+        -- This was originally in the where clause, but for some reason was not being executed as a filter
+        -- see https://github.com/nextstrain/status/issues/8
+        head_branch = (select default_branch from repository r where r.repository_full_name = workflow.repository_full_name) as run_on_default_branch
 
     from
         workflow
             join github_actions_repository_workflow_run as run using (repository_full_name, workflow_id)
 
     where
-            -- XXX FIXME: this correlated subquery is a hack around a steampipe issue… describe why, maybe explore a better work around.
-            head_branch = (select default_branch from repository r where r.repository_full_name = workflow.repository_full_name)
-        and age(run.created_at) <= '90 days'
+            age(run.created_at) <= '90 days'
         and run.created_at >= '2024-02-13T21:50:28Z'::timestamptz -- When I merged <https://github.com/nextstrain/.github/pull/54>. —trs
+),
+
+default_branch_run as materialized (
+    select
+        run.*,
+        row_number() over (
+            partition by
+                repository_full_name,
+                workflow_id
+            order by workflow_run_number desc
+        ) as relative_workflow_run_number
+    from
+        run
+    where
+        run_on_default_branch is True
 )
 
 select
-    json_agg(row_to_json(run))
+    json_agg(row_to_json(default_branch_run))
 from
-    run
+    default_branch_run
 where
     relative_workflow_run_number <= 30
 ;
