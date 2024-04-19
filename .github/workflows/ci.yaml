@@ -34,6 +34,8 @@ jobs:
       - run: make
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # Timeout the this step as a work-around for https://github.com/nextstrain/status/issues/5
+        timeout-minutes: 10
 
       - if: always()
         uses: actions/upload-pages-artifact@v3
