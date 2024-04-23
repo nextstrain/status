@@ -85,7 +85,15 @@ workflow as materialized (
             join github_workflow using (repository_full_name, id)
 
     where
-            workflow_file_content_json @@ '$.jobs.*.uses starts with "nextstrain/.github/.github/workflows/pathogen-repo-build.yaml@"'
+            (workflow_file_content_json @@ '$.jobs.*.uses starts with "nextstrain/.github/.github/workflows/pathogen-repo-build.yaml@"'
+                /* Temporary(?) workaround to include zika's ingest-to-phylogenetic workflow
+                 * We may pursue other methods in the future to include workflows that are not
+                 * directly using pathogen-repo-build.yaml.
+                 *  -Jover, 23 April 2024
+                 *
+                 * <https://github.com/nextstrain/status/issues/12>
+                 */
+                or path = '.github/workflows/ingest-to-phylogenetic.yaml')
         and name != 'CI'
 ),
 
