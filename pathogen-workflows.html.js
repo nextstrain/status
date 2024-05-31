@@ -55,7 +55,7 @@ process.stdout.write(String(html`
       </p>
       ${
         runsByRepoAndWorkflow.map(([repository_full_name, workflows]) => html`
-          <h2 id="">
+          <h2 id="${repository_full_name.replace(/^nextstrain\//, "")}">
             ${repository_full_name.replace(/^nextstrain\//, "")}
             <a href="#${repository_full_name.replace(/^nextstrain\//, "")}">#</a>
           </h2>
