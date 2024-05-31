@@ -43,21 +43,33 @@ process.stdout.write(String(html`
 
     <body>
       <h1>Pathogen workflow status</h1>
-      <nav>
+      <nav aria-label="repo-list">
+        <ul>
+        ${
+          runsByRepoAndWorkflow.map(([repository_full_name,]) => html`
+            <li>
+              <a href="#${repoShortName(repository_full_name)}">
+                ${repoShortName(repository_full_name)}
+              </a>
+            </li>
+          `)
+        }
+        </ul>
+      </nav>
+      <nav aria-labelledby="layout-toggle">
+        <span id="layout-toggle">layout:</span>
         <a href="?">compact</a>
         / <a href="?time-relative">time-relative</a>
       </nav>
-      <p>
-        For repos using our shared <a href="https://github.com/nextstrain/.github/blob/HEAD/.github/workflows/pathogen-repo-build.yaml"><code>pathogen-repo-build.yaml</code> workflow</a>.
-      </p>
       <p class="generated-at">
-        Generated at <time datetime="${generatedAt}">${generatedAt}</time>.
+        Generated at <time datetime="${generatedAt}">${generatedAt}</time>
+        for repos using our shared <a href="https://github.com/nextstrain/.github/blob/HEAD/.github/workflows/pathogen-repo-build.yaml"><code>pathogen-repo-build.yaml</code> workflow</a>.
       </p>
       ${
         runsByRepoAndWorkflow.map(([repository_full_name, workflows]) => html`
-          <h2 id="">
-            ${repository_full_name.replace(/^nextstrain\//, "")}
-            <a href="#${repository_full_name.replace(/^nextstrain\//, "")}">#</a>
+          <h2 id="${repoShortName(repository_full_name)}">
+            ${repoShortName(repository_full_name)}
+            <a href="#${repoShortName(repository_full_name)}">#</a>
           </h2>
           ${
             workflows.map(([workflow_name, runs]) => html`
@@ -92,6 +104,11 @@ process.stdout.write(String(html`
     <script src="pathogen-workflows.js"></script>
   </html>
 `).replace(/^  /gm, '').trim() + "\n");
+
+
+function repoShortName(repository_full_name) {
+  return repository_full_name.replace(/^nextstrain\//, "");
+}
 
 
 function indicator(run) {

@@ -14,7 +14,23 @@ body {
   font-family: sans-serif;
 }
 
-nav {
+h1 {
+  margin-bottom: 0;
+}
+
+nav[aria-label="repo-list"] ul {
+  margin-top: 0;
+  padding-left: 0;
+}
+nav[aria-label="repo-list"] ul li {
+  display: inline-block;
+  list-style: none;
+}
+nav[aria-label="repo-list"] ul li:not(:last-of-type) {
+  padding-right: 1rem;
+}
+
+nav[aria-labelledby="layout-toggle"] {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
