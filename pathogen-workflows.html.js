@@ -55,9 +55,9 @@ process.stdout.write(String(html`
       </p>
       ${
         runsByRepoAndWorkflow.map(([repository_full_name, workflows]) => html`
-          <h2 id="${repository_full_name.replace(/^nextstrain\//, "")}">
-            ${repository_full_name.replace(/^nextstrain\//, "")}
-            <a href="#${repository_full_name.replace(/^nextstrain\//, "")}">#</a>
+          <h2 id="${repoShortName(repository_full_name)}">
+            ${repoShortName(repository_full_name)}
+            <a href="#${repoShortName(repository_full_name)}">#</a>
           </h2>
           ${
             workflows.map(([workflow_name, runs]) => html`
@@ -92,6 +92,11 @@ process.stdout.write(String(html`
     <script src="pathogen-workflows.js"></script>
   </html>
 `).replace(/^  /gm, '').trim() + "\n");
+
+
+function repoShortName(repository_full_name) {
+  return repository_full_name.replace(/^nextstrain\//, "");
+}
 
 
 function indicator(run) {
