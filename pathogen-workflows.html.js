@@ -43,6 +43,19 @@ process.stdout.write(String(html`
 
     <body>
       <h1>Pathogen workflow status</h1>
+      <nav aria-label="repo-list">
+        <ul>
+        ${
+          runsByRepoAndWorkflow.map(([repository_full_name,]) => html`
+            <li>
+              <a href="#${repoShortName(repository_full_name)}">
+                ${repoShortName(repository_full_name)}
+              </a>
+            </li>
+          `)
+        }
+        </ul>
+      </nav>
       <nav aria-labelledby="layout-toggle">
         <span id="layout-toggle">layout:</span>
         <a href="?">compact</a>
