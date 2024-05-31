@@ -47,11 +47,9 @@ process.stdout.write(String(html`
         <a href="?">compact</a>
         / <a href="?time-relative">time-relative</a>
       </nav>
-      <p>
-        For repos using our shared <a href="https://github.com/nextstrain/.github/blob/HEAD/.github/workflows/pathogen-repo-build.yaml"><code>pathogen-repo-build.yaml</code> workflow</a>.
-      </p>
       <p class="generated-at">
-        Generated at <time datetime="${generatedAt}">${generatedAt}</time>.
+        Generated at <time datetime="${generatedAt}">${generatedAt}</time>
+        for repos using our shared <a href="https://github.com/nextstrain/.github/blob/HEAD/.github/workflows/pathogen-repo-build.yaml"><code>pathogen-repo-build.yaml</code> workflow</a>.
       </p>
       ${
         runsByRepoAndWorkflow.map(([repository_full_name, workflows]) => html`
