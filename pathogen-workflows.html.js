@@ -43,7 +43,8 @@ process.stdout.write(String(html`
 
     <body>
       <h1>Pathogen workflow status</h1>
-      <nav>
+      <nav aria-labelledby="layout-toggle">
+        <span id="layout-toggle">layout:</span>
         <a href="?">compact</a>
         / <a href="?time-relative">time-relative</a>
       </nav>
