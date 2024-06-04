@@ -33,7 +33,7 @@ const runsByRepoAndWorkflow =
 // Generate HTML to stdout
 process.stdout.write(String(html`
   <!doctype html>
-  <html>
+  <html class="inhibit-transitions">
     <head>
       <meta charset="utf-8">
       <title>Pathogen workflow status</title>
