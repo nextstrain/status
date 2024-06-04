@@ -25,6 +25,44 @@ function refreshIfAppropriate() {
 setTimeout(refreshIfAppropriate, REFRESH_SECONDS * 1000);
 
 
+/* Calculate values used by the time-relative layout and make them available to
+ * the CSS.  This must happen client-side instead of at static generation time
+ * since the calculations are relative to the current time.
+ *
+ * Do this early on so that values are available soon after initial page load
+ * and definitely before we set data-* attributes from query params below.
+ */
+const now = luxon.DateTime.now().endOf("day");
+
+for (const ol of document.getElementsByTagName("ol")) {
+  let previousDaysAgo = null;
+  let runOfTheDay = 0;
+  let maxRunOfTheDay = 0;
+
+  for (const li of ol.querySelectorAll("li[data-run]")) {
+    const run = JSON.parse(li.dataset.run);
+
+    const createdAt = luxon.DateTime.fromISO(run.created_at).endOf("day");
+    const daysAgo = now.diff(createdAt, "days").days;
+
+    if (previousDaysAgo === daysAgo) {
+      runOfTheDay++;
+    } else {
+      runOfTheDay = 0;
+    }
+
+    li.style.setProperty("--data-days-ago", daysAgo);
+    li.style.setProperty("--data-run-of-the-day", runOfTheDay);
+    li.style.setProperty("--data-offset-left", `-${li.offsetLeft || 0}px`);
+
+    previousDaysAgo = daysAgo;
+    maxRunOfTheDay = Math.max(maxRunOfTheDay, runOfTheDay);
+  }
+
+  ol.style.setProperty("--data-max-run-of-the-day", maxRunOfTheDay);
+}
+
+
 /* Set query params as data-* attributes on the document so CSS can use them.
  * We do this at several possible points in time.
  */
@@ -108,39 +146,4 @@ for (const details of document.querySelectorAll("details")) {
       }
     }
   });
-}
-
-
-/* Calculate values used by the time-relative layout and make them available to
- * the CSS.  This must happen client-side instead of at static generation time
- * since the calculations are relative to the current time.
- */
-const now = luxon.DateTime.now().endOf("day");
-
-for (const ol of document.getElementsByTagName("ol")) {
-  let previousDaysAgo = null;
-  let runOfTheDay = 0;
-  let maxRunOfTheDay = 0;
-
-  for (const li of ol.querySelectorAll("li[data-run]")) {
-    const run = JSON.parse(li.dataset.run);
-
-    const createdAt = luxon.DateTime.fromISO(run.created_at).endOf("day");
-    const daysAgo = now.diff(createdAt, "days").days;
-
-    if (previousDaysAgo === daysAgo) {
-      runOfTheDay++;
-    } else {
-      runOfTheDay = 0;
-    }
-
-    li.style.setProperty("--data-days-ago", daysAgo);
-    li.style.setProperty("--data-run-of-the-day", runOfTheDay);
-    li.style.setProperty("--data-offset-left", `-${li.offsetLeft || 0}px`);
-
-    previousDaysAgo = daysAgo;
-    maxRunOfTheDay = Math.max(maxRunOfTheDay, runOfTheDay);
-  }
-
-  ol.style.setProperty("--data-max-run-of-the-day", maxRunOfTheDay);
 }
