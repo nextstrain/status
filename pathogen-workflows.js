@@ -147,3 +147,8 @@ for (const details of document.querySelectorAll("details")) {
     }
   });
 }
+
+
+/* Remove transition inhibition a short time after we're all done.
+ */
+setTimeout(() => document.querySelector(":root").classList.remove("inhibit-transitions"), 1000);

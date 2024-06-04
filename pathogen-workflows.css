@@ -9,6 +9,9 @@
   --color-cancelled: #666;
   --background-cancelled: #eee;
 }
+:root.inhibit-transitions * {
+  transition: none !important;
+}
 
 body {
   font-family: sans-serif;
