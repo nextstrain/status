@@ -149,6 +149,53 @@ for (const details of document.querySelectorAll("details")) {
 }
 
 
+/* Allow keyboard navigation via h/j/k/l when viewing details for a run.  Handy
+ * for quickly scanning thru details (e.g. durations, start times, etc.) about
+ * a string of runs.
+ */
+document.addEventListener("keydown", event => {
+  /* Ignore events involved in multi-key composition, see
+   * <https://developer.mozilla.org/en-US/docs/Web/API/Element/keyup_event>.
+   */
+  if (event.isComposing || event.keyCode === 229)
+    return;
+
+  let adjacentDetails;
+
+  switch (event.key) {
+    case "h":
+      adjacentDetails = queryPath("//details[@open]/ancestor::li/preceding-sibling::li[1]//details");
+      break;
+    case "l":
+      adjacentDetails = queryPath("//details[@open]/ancestor::li/following-sibling::li[1]//details");
+      break;
+
+    /* XXX TODO: Preserve left/right position between lists, taking into
+     * account layout (compact vs. time-relative).
+     *   -trs, 5 June 2024
+     */
+    case "k":
+      adjacentDetails = queryPath("//details[@open]/ancestor::ol/preceding-sibling::ol[1]//li//details");
+      break;
+    case "j":
+      adjacentDetails = queryPath("//details[@open]/ancestor::ol/following-sibling::ol[1]//li//details");
+      break;
+  }
+
+  if (adjacentDetails) {
+    adjacentDetails.open = true;
+    adjacentDetails.querySelector("summary").focus(); // so space/enter toggles the correct element
+  }
+});
+
+
+/* Like querySelector(), but for XPath instead of CSS selectors.
+ */
+function queryPath(path, element = document) {
+  return document.evaluate(path, element, null, XPathResult.FIRST_ORDERED_NODE_TYPE)?.singleNodeValue;
+}
+
+
 /* Remove transition inhibition a short time after we're all done.
  */
 setTimeout(() => document.querySelector(":root").classList.remove("inhibit-transitions"), 1000);
