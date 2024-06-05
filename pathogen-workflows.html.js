@@ -68,13 +68,13 @@ process.stdout.write(String(html`
       ${
         runsByRepoAndWorkflow.map(([repository_full_name, workflows]) => html`
           <h2 id="${repoShortName(repository_full_name)}">
-            ${repoShortName(repository_full_name)}
+            <a href="https://github.com/${repository_full_name}">${repoShortName(repository_full_name)}</a>
             <a href="#${repoShortName(repository_full_name)}">#</a>
           </h2>
           ${
             workflows.map(([workflow_name, runs]) => html`
               <h3>
-                ${workflow_name}
+                <a href="https://github.com/${repository_full_name}/actions/${encodeURI(runs[0].workflow_path.replace(/^[.]github\//, ""))}">${workflow_name}</a>
                 <span>(<a href="${runs[0].workflow_html_url}"><code>${runs[0].workflow_path}</code></a>)</span>
               </h3>
               <ol>
