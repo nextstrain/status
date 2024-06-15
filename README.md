@@ -26,6 +26,7 @@ Requirements:
 - [Steampipe](https://steampipe.io/downloads) CLI
 - [turbot/net](https://hub.steampipe.io/plugins/turbot/net) steampipe plugin: `steampipe plugin install net`
 - [turbot/githubsteampipe](https://hub.steampipe.io/plugins/turbot/githubsteampipe) steampipe plugin: `steampipe plugin install github`
+- `GITHUB_TOKEN` environment variable to be set, e.g. using `GITHUB_TOKEN=$(gh auth token)`
 - GNU Make
 - PostgreSQL `psql` client (no server components necessary)
 
