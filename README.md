@@ -24,6 +24,7 @@ Requirements:
 
 - [Node.js](https://nodejs.org/en/download) (at least 16, higher probably works too)
 - [Steampipe](https://steampipe.io/downloads) CLI
+- [turbo/net](https://hub.steampipe.io/plugins/turbot/net) steampipe plugin: `steampipe plugin install net`
 - GNU Make
 - PostgreSQL `psql` client (no server components necessary)
 
