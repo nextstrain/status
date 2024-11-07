@@ -38,6 +38,7 @@ process.stdout.write(String(html`
       <meta charset="utf-8">
       <title>Pathogen workflow status</title>
       <meta name="viewport" content="width=device-width, initial-scale=1">
+      <link rel="icon" href="favicon.svg" />
       <link rel="stylesheet" href="pathogen-workflows.css">
     </head>
 
