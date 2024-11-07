@@ -38,6 +38,7 @@ process.stdout.write(String(html`
       <meta charset="utf-8">
       <title>Pathogen workflow status</title>
       <meta name="viewport" content="width=device-width, initial-scale=1">
+      <link rel="icon" href="favicon.svg" />
       <link rel="stylesheet" href="pathogen-workflows.css">
     </head>
 
@@ -63,6 +64,7 @@ process.stdout.write(String(html`
       </nav>
       <p class="generated-at">
         Generated at <time datetime="${generatedAt}">${generatedAt}</time>
+        by <a href="https://github.com/nextstrain/status">nextstrain/status</a>
         for repos using our shared <a href="https://github.com/nextstrain/.github/blob/HEAD/.github/workflows/pathogen-repo-build.yaml"><code>pathogen-repo-build.yaml</code> workflow</a>.
       </p>
       ${
