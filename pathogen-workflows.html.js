@@ -29,6 +29,13 @@ const runsByRepoAndWorkflow =
     d => d.repository_full_name,
     d => d.workflow_name );
 
+const someFailure =
+  runsByRepoAndWorkflow
+    .flatMap(([, workflows]) =>
+      workflows.map(([, runs]) =>
+        runs[0].conclusion ?? runs[0].status))
+    .some(x => x === "failure");
+
 
 // Generate HTML to stdout
 process.stdout.write(String(html`
@@ -38,7 +45,7 @@ process.stdout.write(String(html`
       <meta charset="utf-8">
       <title>Pathogen workflow status</title>
       <meta name="viewport" content="width=device-width, initial-scale=1">
-      <link rel="icon" href="favicon.svg" />
+      <link rel="icon" href="favicon-${someFailure ? "failure" : "success"}.svg" />
       <link rel="stylesheet" href="pathogen-workflows.css">
     </head>
 
