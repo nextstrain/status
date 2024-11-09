@@ -4,7 +4,7 @@ build := build
 
 .DELETE_ON_ERROR:
 
-all: $(build)/pathogen-workflows.html $(build)/index.html $(build)/favicon.svg
+all: $(build)/pathogen-workflows.html $(build)/index.html $(build)/favicon-success.svg $(build)/favicon-failure.svg $(build)/favicon-question.svg
 
 $(build)/pathogen-workflows.html: $(build)/pathogen-workflows.json $(build)/pathogen-workflows.css $(build)/pathogen-workflows.js $(build)/luxon.min.js pathogen-workflows.html.js | $(build) node_modules
 	./pathogen-workflows.html.js < $< > $@
@@ -12,10 +12,17 @@ $(build)/pathogen-workflows.html: $(build)/pathogen-workflows.json $(build)/path
 $(build)/pathogen-workflows.json: $(build)/%.json: %.sql | $(build)
 	./steampipe-psql --quiet --no-psqlrc --no-align --tuples-only --set=ON_ERROR_STOP= < $< > $@
 
+$(build)/favicon-%.svg: favicon.svg favicon-[layer].svg.py | $(build)
+	@# Strip Inkscape-specific elements/attributes.
+	@# Remove layers other than the base layer and requested layer.
+	< $< \
+	  inkscape --pipe --export-plain-svg --export-area-page --export-filename - \
+	| ./favicon-'[layer]'.svg.py $* \
+	> $@
+
 copied := \
 	$(build)/pathogen-workflows.css \
 	$(build)/pathogen-workflows.js \
-	$(build)/favicon.svg \
 	$(build)/index.html
 
 $(copied): $(build)/%: % | $(build)
