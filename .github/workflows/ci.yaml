@@ -31,7 +31,7 @@ jobs:
         with:
           node-version: 16
 
-      - run: make
+      - run: make --assume-old=favicon.svg --assume-old="favicon-[layer].svg.py"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # Timeout the this step as a work-around for https://github.com/nextstrain/status/issues/5
