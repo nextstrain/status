@@ -1,7 +1,7 @@
 # Nextstrain status pages
 
 Source code for producing high-level status pages of Nextstrain's operations at
-<https://nextstrain.github.io/status/>.
+<https://status.nextstrain.org>.
 
 - Accesses data from GitHub's API via [Steampipe](https://steampipe.io) SQL queries
 - Generates static HTML pages from the queried data
