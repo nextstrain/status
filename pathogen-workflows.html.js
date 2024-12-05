@@ -54,10 +54,16 @@ process.stdout.write(String(html`
       <nav aria-label="repo-list">
         <ul>
         ${
-          runsByRepoAndWorkflow.map(([repository_full_name,]) => html`
+          runsByRepoAndWorkflow.map(([repository_full_name, workflows]) => html`
             <li>
               <a href="#${repoShortName(repository_full_name)}">
-                ${repoShortName(repository_full_name)}
+                ${
+                  workflows
+                    .map(([, runs]) => runs[0].conclusion ?? runs[0].status)
+                    .some(x => x === "failure")
+                  ? html`<span class="indicator failure">${indicator({conclusion: "failure"})} </span>`
+                  : ""
+                }${repoShortName(repository_full_name)}
               </a>
             </li>
           `)

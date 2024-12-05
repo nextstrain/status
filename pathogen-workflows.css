@@ -32,6 +32,14 @@ nav[aria-label="repo-list"] ul li {
 nav[aria-label="repo-list"] ul li:not(:last-of-type) {
   padding-right: 1rem;
 }
+nav[aria-label="repo-list"] ul li .indicator {
+  text-decoration: white underline;
+}
+nav[aria-label="repo-list"] ul li .indicator.failure {
+  color: var(--color-failure);
+  position: relative;
+  top: 1px;
+}
 
 nav[aria-labelledby="layout-toggle"] {
   position: absolute;
