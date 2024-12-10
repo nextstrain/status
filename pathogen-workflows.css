@@ -12,6 +12,9 @@
 :root.inhibit-transitions * {
   transition: none !important;
 }
+:root:not(.offline) .display-offline-only {
+  display: none !important;
+}
 
 body {
   font-family: sans-serif;
@@ -53,6 +56,17 @@ nav[aria-labelledby="layout-toggle"] {
   pointer-events: none;
   color: inherit;
   text-decoration: none;
+}
+
+.offline-warning {
+  background: orangered;
+  color: seashell;
+  padding: 1em;
+  border: 2px solid black;
+
+  position: sticky;
+  top: -2px;
+  z-index: 3;
 }
 
 .generated-at {
