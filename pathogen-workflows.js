@@ -13,6 +13,11 @@
 const REFRESH_SECONDS = 60; // seconds
 
 function refreshIfAppropriate() {
+  if (!navigator.onLine) {
+    console.log("Offline… delaying refresh for another minute");
+    setTimeout(refreshIfAppropriate, REFRESH_SECONDS * 1000);
+    return;
+  }
   if (document.querySelectorAll("details[open]").length) {
     console.log("<details> are open… delaying refresh for another minute");
     setTimeout(refreshIfAppropriate, REFRESH_SECONDS * 1000);
@@ -194,6 +199,17 @@ document.addEventListener("keydown", event => {
 function queryPath(path, element = document) {
   return document.evaluate(path, element, null, XPathResult.FIRST_ORDERED_NODE_TYPE)?.singleNodeValue;
 }
+
+
+/* Reflect offline status for CSS.
+ */
+function updateOfflineStatus() {
+  document.querySelector(":root").classList.toggle("offline", !navigator.onLine);
+}
+
+updateOfflineStatus();
+window.addEventListener("online",  updateOfflineStatus);
+window.addEventListener("offline", updateOfflineStatus);
 
 
 /* Remove transition inhibition a short time after we're all done.
