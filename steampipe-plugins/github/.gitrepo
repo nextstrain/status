@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/ingydotnet/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/nextstrain/steampipe-plugin-github
+	branch = nextstrain/status
+	commit = 80bfce2db51dd254b79fb138ed54c7a3c7e1e4eb
+	parent = c29405be856d0d55f9908f7246e3ddd7ce8e8b62
+	method = merge
+	cmdver = 0.4.6
