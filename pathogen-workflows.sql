@@ -58,7 +58,7 @@ create or replace function github_actions_repository_workflow_runs_on_branch(
     )
     returns setof github_actions_repository_workflow_run
     language sql as $$
-        -- Invokes https://api.github.com/repos/{+repo}/actions/runs{?branch} (filters on workflow id locally)
+        -- Invokes https://api.github.com/repos/{+repo}/actions/workflows/{id}/runs{?branch}
         select *
           from github_actions_repository_workflow_run as run
          where run.repository_full_name = _repository_full_name

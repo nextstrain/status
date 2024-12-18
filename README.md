@@ -25,7 +25,7 @@ Requirements:
 - [Node.js](https://nodejs.org/en/download) (at least 16, higher probably works too)
 - [Steampipe](https://steampipe.io/downloads) CLI
 - [net plugin](https://hub.steampipe.io/plugins/turbot/net) for Steampipe: `steampipe plugin install net`
-- [github plugin](https://hub.steampipe.io/plugins/turbot/github) for Steampipe: `steampipe plugin install github`
+- [github plugin](https://hub.steampipe.io/plugins/turbot/github) for Steampipe: `steampipe plugin install github && make -C steampipe-plugins/github`
 - `GITHUB_TOKEN` environment variable to be set, e.g. using `GITHUB_TOKEN=$(gh auth token)`
 - GNU Make
 - PostgreSQL `psql` client (no server components necessary)
