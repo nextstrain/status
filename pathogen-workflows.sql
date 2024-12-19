@@ -99,7 +99,11 @@ workflow as materialized (
 
 run as materialized (
     select
-        workflow.*,
+        workflow.repository_full_name,
+        workflow.workflow_id,
+        workflow.workflow_path,
+        workflow.workflow_name,
+        workflow.workflow_html_url,
 
         run.run_number                  as workflow_run_number,
         run.id                          as id,
