@@ -18,14 +18,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          cache-dependency-path: steampipe-plugins/*/go.sum
+
       - name: Install Steampipe
         run: |
           sudo /bin/sh -c "$(curl -fsSL https://steampipe.io/install/steampipe.sh)"
           steampipe --version
           steampipe plugin install github
           steampipe plugin install net
-
-      - uses: actions/checkout@v4
+          make -C steampipe-plugins/github
 
       - uses: actions/setup-node@v4
         with:
