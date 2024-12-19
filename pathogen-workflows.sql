@@ -14,6 +14,59 @@
  */
 set intervalstyle = 'iso_8601';
 
+/* Steampipe's conceit of "it's just tables and SQL" has a tendency to break
+ * down in the face of complex queries and reveal cracks in the abstraction.
+ * When the query planner really rolls up its sleeves and digs in, it can often
+ * shuffle around where filter conditions are applied in ways that _really
+ * matter_ to Steampipe's operation.  For example, it might move a filter
+ * condition from a Steampipe table scan to an outer query plan step if it deems
+ * it more efficient to do so.  In the best case, this makes Steampipe's tables
+ * slower, i.e. they fetch more data than necessary from the upstream API and
+ * filter locally instead of passing the filter thru.  In the worst case,
+ * though, it breaks the query because the filter condition was one required by
+ * the Steampipe table.¹  The query planner isn't operating with full knowledge
+ * here, so can't really be blamed.
+ *
+ * We, on the other hand, *can* operate with full knowledge and can tailor our
+ * Steampipe access patterns (when necessary) to ones that are most efficient
+ * (and robust to query plan changes), e.g. maximally filtered list operations
+ * and precise get operations.  The clearest way to do this, AFAICT, is to
+ * isolate such a Steampipe query within a record- or table-returning
+ * function.²  Doing so creates a boundary the query planner won't optimize
+ * across.
+ *
+ * Steampipe tables are essentially RPCs (somewhat elaborate ones), and so
+ * wrapping them in functions also makes that reality a bit clearer and easier
+ * to keep in mind.  In that vein, if for some future queries we find ourselves
+ * not making much use of the wonders of Pg and SQL and relational algebra, we
+ * may find it simplifying in those cases to use Steampipe's standalone
+ * exporters (which also make clearer the RPC-ness).³
+ *   -trs, 18 Dec 2024
+ *
+ * ¹ e.g. <https://github.com/nextstrain/status/issues/8#issuecomment-2048630861>
+ * ² <https://www.postgresql.org/docs/14/xfunc-sql.html#XFUNC-SQL-TABLE-FUNCTIONS>
+     <https://www.postgresql.org/docs/14/xfunc-sql.html#XFUNC-SQL-FUNCTIONS-RETURNING-SET>
+     <https://www.postgresql.org/docs/14/xfunc-sql.html#XFUNC-SQL-FUNCTIONS-RETURNING-TABLE>
+     (Pg 14 because that's what Steampipe CLI currently bundles.)
+ * ³ <https://steampipe.io/docs/steampipe_export/run>
+ */
+-- Gigantic name to parallel the Steampipe table
+create or replace function github_actions_repository_workflow_runs_on_branch(
+        _repository_full_name text,
+        _workflow_id text,
+        _head_branch text
+    )
+    returns setof github_actions_repository_workflow_run
+    language sql as $$
+        -- Invokes https://api.github.com/repos/{+repo}/actions/runs{?branch} (filters on workflow id locally)
+        select *
+          from github_actions_repository_workflow_run as run
+         where run.repository_full_name = _repository_full_name
+           and run.workflow_id          = _workflow_id
+           and run.head_branch          = _head_branch
+    $$
+;
+
 with
 
 repository as materialized (
@@ -120,39 +173,30 @@ run as materialized (
         run.head_sha                    as commit_id,
         run.head_commit->>'message'     as commit_msg,
 
-        -- XXX FIXME: this correlated subquery is a hack around a steampipe issue… describe why, maybe explore a better work around.
-        -- This was originally in the where clause, but for some reason was not being executed as a filter
-        -- see https://github.com/nextstrain/status/issues/8
-        head_branch = (select default_branch from repository r where r.repository_full_name = workflow.repository_full_name) as run_on_default_branch
+        row_number() over (
+            partition by
+                workflow.repository_full_name,
+                workflow.workflow_id
+            order by run.run_number desc
+        ) as relative_workflow_run_number
 
     from
-        workflow
-            join github_actions_repository_workflow_run as run using (repository_full_name, workflow_id)
+        workflow,
+        github_actions_repository_workflow_runs_on_branch(
+            repository_full_name,
+            workflow_id,
+            (select default_branch from repository r where r.repository_full_name = workflow.repository_full_name)
+        ) as run
 
     where
             age(run.created_at) <= '90 days'
         and run.created_at >= '2024-02-13T21:50:28Z'::timestamptz -- When I merged <https://github.com/nextstrain/.github/pull/54>. —trs
-),
-
-default_branch_run as materialized (
-    select
-        run.*,
-        row_number() over (
-            partition by
-                repository_full_name,
-                workflow_id
-            order by workflow_run_number desc
-        ) as relative_workflow_run_number
-    from
-        run
-    where
-        run_on_default_branch is True
 )
 
 select
-    json_agg(row_to_json(default_branch_run))
+    json_agg(row_to_json(run.*))
 from
-    default_branch_run
+    run
 where
     relative_workflow_run_number <= 30
 ;
