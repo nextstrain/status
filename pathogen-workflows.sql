@@ -218,6 +218,14 @@ run_last_attempt as materialized (
         ) as run
 
     where
+        /* XXX TODO: Push created_at into the GitHub API call.  The API can
+         * handle created timesetamp¹ with operators = <> > >= < <=.²  This
+         * would avoid a bunch of pagination requests for the list call.
+         *   -trs, 18 Dec 2024
+         *
+         * ¹ <https://docs.github.com/en/rest/actions/workflow-runs?apiVersion=2022-11-28#list-workflow-runs-for-a-workflow>
+         * ² <https://docs.github.com/en/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates>
+         */
             age(run.created_at) <= '90 days'
         and run.created_at >= '2024-02-13T21:50:28Z'::timestamptz -- When I merged <https://github.com/nextstrain/.github/pull/54>. —trs
 ),
