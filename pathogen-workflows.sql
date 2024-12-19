@@ -50,7 +50,7 @@ set intervalstyle = 'iso_8601';
      (Pg 14 because that's what Steampipe CLI currently bundles.)
  * ³ <https://steampipe.io/docs/steampipe_export/run>
  */
--- Gigantic name to parallel the Steampipe table
+-- Gigantic names to parallel the Steampipe table
 create or replace function github_actions_repository_workflow_runs_on_branch(
         _repository_full_name text,
         _workflow_id text,
@@ -64,6 +64,22 @@ create or replace function github_actions_repository_workflow_runs_on_branch(
          where run.repository_full_name = _repository_full_name
            and run.workflow_id          = _workflow_id
            and run.head_branch          = _head_branch
+    $$
+;
+
+create or replace function github_actions_repository_workflow_run_attempt(
+        _repository_full_name text,
+        _id bigint,
+        _run_attempt bigint
+    )
+    returns github_actions_repository_workflow_run
+    language sql as $$
+        -- Invokes https://api.github.com/repos/{+repo}/actions/runs/{id}/attempts/{attempt}
+        select *
+          from github_actions_repository_workflow_run as run
+         where run.repository_full_name = _repository_full_name
+           and run.id                   = _id
+           and run.run_attempt          = _run_attempt
     $$
 ;
 
@@ -150,7 +166,15 @@ workflow as materialized (
         and name != 'CI'
 ),
 
-run as materialized (
+/* Last run attempts¹ for all workflows of interest, within the past 90 days.
+ *
+ * ¹ Slight caveat is that one of these rows represents an aggregate over _all_
+ *   attempts of a run, and so for runs with run_attempt > 1, the row here will
+ *   be slightly different than if we fetched the row for that attempt
+ *   specifically.  We handle this in another CTE below.
+ *     -trs, 17 Dec 2024
+ */
+run_last_attempt as materialized (
     select
         workflow.repository_full_name,
         workflow.workflow_id,
@@ -160,7 +184,11 @@ run as materialized (
 
         run.run_number                  as workflow_run_number,
         run.id                          as id,
-        run.html_url,
+
+        -- Keep in sync with the matching select list in "attempt" below.
+        run.run_attempt                 as attempt,
+        format('%s/attempts/%s', run.html_url, run.run_attempt)
+                                        as html_url,
         run.created_at,
         run.updated_at,
         run.conclusion,
@@ -172,6 +200,7 @@ run as materialized (
         run.event,
         run.head_sha                    as commit_id,
         run.head_commit->>'message'     as commit_msg,
+        --
 
         row_number() over (
             partition by
@@ -191,12 +220,92 @@ run as materialized (
     where
             age(run.created_at) <= '90 days'
         and run.created_at >= '2024-02-13T21:50:28Z'::timestamptz -- When I merged <https://github.com/nextstrain/.github/pull/54>. —trs
+),
+
+/* Filter to the last 30 runs.
+ */
+recent as materialized (
+    select
+        *
+    from
+        run_last_attempt
+    where
+        relative_workflow_run_number <= 30
+),
+
+/* Backfill previous run attempts.
+ */
+attempt as materialized (
+    /* If the last run is attempt 1, then we can use the row we already have
+     * as-is without fetching additional rows.  This is true for most runs!
+     * That's good, because GitHub's REST API doesn't provide an efficient way
+     * of fetching previous run attempts.
+     *   -trs, 17 Dec 2024
+     */
+    select
+        repository_full_name,
+        workflow_id,
+        workflow_path,
+        workflow_name,
+        workflow_html_url,
+        workflow_run_number,
+        id,
+        attempt,
+        html_url,
+        created_at,
+        updated_at,
+        conclusion,
+        status,
+        duration,
+        event,
+        commit_id,
+        commit_msg
+    from
+        recent
+    where
+        attempt = 1
+
+    union all
+
+    select
+        recent.repository_full_name,
+        recent.workflow_id,
+        recent.workflow_path,
+        recent.workflow_name,
+        recent.workflow_html_url,
+        recent.workflow_run_number,
+        recent.id,
+
+        -- Keep in sync with the matching select list in "run_last_attempt" above.
+        run.run_attempt                 as attempt,
+        format('%s/attempts/%s', run.html_url, run.run_attempt)
+                                        as html_url,
+        run.created_at,
+        run.updated_at,
+        run.conclusion,
+        run.status,
+        case when run.conclusion is not null
+            then run.updated_at - run.created_at
+            else current_timestamp(0) - run.created_at
+        end                             as duration,
+        run.event,
+        run.head_sha                    as commit_id,
+        run.head_commit->>'message'     as commit_msg
+        --
+
+    from
+        recent
+            join lateral generate_series(attempt, 1, -1)
+                as run_attempt
+                on (attempt > 1)
+
+            join lateral github_actions_repository_workflow_run_attempt(repository_full_name, id, run_attempt)
+                as run
+                on true
 )
 
 select
-    json_agg(row_to_json(run.*))
+    json_agg(row_to_json(attempt.*))
 from
-    run
-where
-    relative_workflow_run_number <= 30
+    attempt
 ;
