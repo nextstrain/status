@@ -105,6 +105,11 @@ process.stdout.write(String(html`
                         <time datetime="${run.created_at}">${run.created_at}</time>
                         <time datetime="${run.duration}">${run.duration}</time>
                         <a href="${run.html_url}">run details</a>
+                        ${
+                          run.attempt > 1
+                            ? html`attempt #${run.attempt}`
+                            : ''
+                        }
                         <code>${run.event}</code>
                         <code>${run.commit_id.slice(0, 8)}</code>
                       </div>
