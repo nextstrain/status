@@ -37,7 +37,7 @@ setTimeout(refreshIfAppropriate, REFRESH_SECONDS * 1000);
  * Do this early on so that values are available soon after initial page load
  * and definitely before we set data-* attributes from query params below.
  */
-const now = luxon.DateTime.now().endOf("day");
+const endOfToday = luxon.DateTime.now().endOf("day");
 
 for (const ol of document.getElementsByTagName("ol")) {
   let previousDaysAgo = null;
@@ -48,7 +48,7 @@ for (const ol of document.getElementsByTagName("ol")) {
     const run = JSON.parse(li.dataset.run);
 
     const createdAt = luxon.DateTime.fromISO(run.created_at).endOf("day");
-    const daysAgo = now.diff(createdAt, "days").days;
+    const daysAgo = endOfToday.diff(createdAt, "days").days;
 
     if (previousDaysAgo === daysAgo) {
       runOfTheDay++;
