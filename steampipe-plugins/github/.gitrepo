@@ -7,6 +7,6 @@
 	remote = https://github.com/nextstrain/steampipe-plugin-github
 	branch = nextstrain/status
 	commit = 80bfce2db51dd254b79fb138ed54c7a3c7e1e4eb
-	parent = c29405be856d0d55f9908f7246e3ddd7ce8e8b62
+	parent = e79e45d4f8b86be3ed87d88d71dc1be25bf4ccec
 	method = merge
 	cmdver = 0.4.6
