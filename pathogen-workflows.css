@@ -55,10 +55,10 @@ nav[aria-labelledby="layout-toggle"] {
   text-decoration: none;
 }
 
-#offline-warning {
+#warnings {
   background: orangered;
   color: seashell;
-  padding: 1em;
+  padding: 0 1em;
   border: 2px solid black;
 
   position: sticky;
@@ -66,8 +66,9 @@ nav[aria-labelledby="layout-toggle"] {
   z-index: 3;
 }
 
-#offline-warning { display: none }
-:root.offline #offline-warning { display: block }
+#warnings, #offline-warning, #stale-warning { display: none }
+:root.offline { #warnings, #offline-warning { display: block } }
+:root.stale   { #warnings, #stale-warning   { display: block } }
 
 #generated-at {
   font-size: small;

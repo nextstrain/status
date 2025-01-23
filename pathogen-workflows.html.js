@@ -75,9 +75,16 @@ process.stdout.write(String(html`
         <a href="?">compact</a>
         / <a href="?time-relative">time-relative</a>
       </nav>
-      <p id="offline-warning">
-        You’re offline.  Automatic refresh is paused and information may be stale.
-      </p>
+      <div id="warnings">
+        <p id="offline-warning">
+          You’re offline.  Automatic refresh is paused and information may be stale.
+        </p>
+        <p id="stale-warning" data-stale-threshold="PT30M">
+          Page was generated
+          <time datetime="${generatedAt}" data-relative>more than 30 minutes ago</time>.
+          Information may be stale.
+        </p>
+      </div>
       <p id="generated-at">
         Generated at <time datetime="${generatedAt}">${generatedAt}</time>
         by <a href="https://github.com/nextstrain/status">nextstrain/status</a>
