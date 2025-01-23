@@ -12,9 +12,6 @@
 :root.inhibit-transitions * {
   transition: none !important;
 }
-:root:not(.offline) .display-offline-only {
-  display: none !important;
-}
 
 body {
   font-family: sans-serif;
@@ -58,7 +55,7 @@ nav[aria-labelledby="layout-toggle"] {
   text-decoration: none;
 }
 
-.offline-warning {
+#offline-warning {
   background: orangered;
   color: seashell;
   padding: 1em;
@@ -69,7 +66,10 @@ nav[aria-labelledby="layout-toggle"] {
   z-index: 3;
 }
 
-.generated-at {
+#offline-warning { display: none }
+:root.offline #offline-warning { display: block }
+
+#generated-at {
   font-size: small;
 }
 

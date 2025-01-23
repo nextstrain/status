@@ -75,10 +75,10 @@ process.stdout.write(String(html`
         <a href="?">compact</a>
         / <a href="?time-relative">time-relative</a>
       </nav>
-      <p class="display-offline-only offline-warning">
+      <p id="offline-warning">
         You’re offline.  Automatic refresh is paused and information may be stale.
       </p>
-      <p class="generated-at">
+      <p id="generated-at">
         Generated at <time datetime="${generatedAt}">${generatedAt}</time>
         by <a href="https://github.com/nextstrain/status">nextstrain/status</a>
         for repos using our shared <a href="https://github.com/nextstrain/.github/blob/HEAD/.github/workflows/pathogen-repo-build.yaml"><code>pathogen-repo-build.yaml</code> workflow</a>.
