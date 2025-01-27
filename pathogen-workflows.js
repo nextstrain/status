@@ -37,7 +37,7 @@ setTimeout(refreshIfAppropriate, REFRESH_SECONDS * 1000);
  * Do this early on so that values are available soon after initial page load
  * and definitely before we set data-* attributes from query params below.
  */
-const now = luxon.DateTime.now().endOf("day");
+const endOfToday = luxon.DateTime.now().endOf("day");
 
 for (const ol of document.getElementsByTagName("ol")) {
   let previousDaysAgo = null;
@@ -48,7 +48,7 @@ for (const ol of document.getElementsByTagName("ol")) {
     const run = JSON.parse(li.dataset.run);
 
     const createdAt = luxon.DateTime.fromISO(run.created_at).endOf("day");
-    const daysAgo = now.diff(createdAt, "days").days;
+    const daysAgo = endOfToday.diff(createdAt, "days").days;
 
     if (previousDaysAgo === daysAgo) {
       runOfTheDay++;
@@ -135,6 +135,23 @@ for (const time of document.getElementsByTagName("time")) {
 }
 
 
+/* Keep relative datetimes updated.
+ */
+function updateRelativeTimes() {
+  const now = luxon.DateTime.now();
+
+  for (const time of document.getElementsByTagName("time")) {
+    if ("relative" in time.dataset) {
+      time.luxonDateTime ??= luxon.DateTime.fromISO(time.dateTime);
+      time.textContent = time.luxonDateTime.toRelative({ base: now });
+    }
+  }
+}
+
+updateRelativeTimes();
+setInterval(updateRelativeTimes, (REFRESH_SECONDS + 5) * 1000);
+
+
 /* Close already open <detail>s when another one is opened.  The toggle event
  * does not bubble¹, so we can't attach a single listener for the whole
  * document.
@@ -210,6 +227,26 @@ function updateOfflineStatus() {
 updateOfflineStatus();
 window.addEventListener("online",  updateOfflineStatus);
 window.addEventListener("offline", updateOfflineStatus);
+
+
+/* Reflect staleness for CSS.
+ */
+let staleThreshold = document.getElementById("stale-warning")?.dataset.staleThreshold;
+if (staleThreshold) {
+  staleThreshold = luxon.Duration.fromISO(staleThreshold);
+
+  let generatedAt = document.querySelector("#generated-at time")?.dateTime;
+  if (generatedAt) {
+    generatedAt = luxon.DateTime.fromISO(generatedAt);
+
+    function updateStaleness() {
+      const generatedAgo = luxon.DateTime.now().diff(generatedAt);
+      document.querySelector(":root").classList.toggle("stale", generatedAgo > staleThreshold);
+    }
+    updateStaleness();
+    setInterval(updateStaleness, (REFRESH_SECONDS + 5) * 1000);
+  }
+}
 
 
 /* Remove transition inhibition a short time after we're all done.
