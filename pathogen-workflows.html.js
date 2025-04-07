@@ -24,7 +24,7 @@ const runsByRepoAndWorkflow =
       workflowRuns,
       d => d.repository_full_name.toLowerCase(),
       d => d.workflow_name.toLowerCase(),
-      d => -d.created_at,
+      d => -(new Date(d.created_at)),
       d => -d.id),
     d => d.repository_full_name,
     d => d.workflow_name );
