@@ -50,6 +50,7 @@ for (const ol of document.getElementsByTagName("ol")) {
     const createdAt = luxon.DateTime.fromISO(run.created_at).endOf("day");
     const daysAgo = endOfToday.diff(createdAt, "days").days;
 
+    // This relies on the run <li>'s being sorted by created_at.
     if (previousDaysAgo === daysAgo) {
       runOfTheDay++;
     } else {
