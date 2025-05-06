@@ -8,6 +8,8 @@
   --background-in-progress: lightblue;
   --color-cancelled: #666;
   --background-cancelled: #eee;
+  --color-skipped: #666;
+  --background-skipped: #eee;
 }
 :root.inhibit-transitions * {
   transition: none !important;
@@ -148,6 +150,9 @@ ol > li.in-progress {
 ol > li.cancelled {
   background: var(--background-cancelled);
 }
+ol > li.skipped {
+  background: var(--background-skipped);
+}
 ol > li > details > summary {
   /* Remove default triangle bullet, per spec.
    * <https://developer.mozilla.org/en-US/docs/Web/HTML/Element/summary#default_style>
@@ -190,6 +195,9 @@ ol > li.in-progress > details > summary {
 ol > li.cancelled > details > summary {
   color: var(--color-cancelled);
 }
+ol > li.skipped > details > summary {
+  color: var(--color-skipped);
+}
 ol > li > details[open] > summary {
   position: relative;
   z-index: 2;
@@ -207,6 +215,9 @@ ol > li.in-progress > details[open] > summary {
 }
 ol > li.cancelled > details[open] > summary {
   border-bottom: 1px solid var(--background-cancelled);
+}
+ol > li.skipped > details[open] > summary {
+  border-bottom: 1px solid var(--background-skipped);
 }
 ol > li > details > div {
   position: relative;
@@ -235,6 +246,9 @@ ol > li.in-progress > details > div {
 }
 ol > li.cancelled > details > div {
   background: var(--background-cancelled);
+}
+ol > li.skipped > details > div {
+  background: var(--background-skipped);
 }
 ol > li > details > div > time {
   display: block;

@@ -147,6 +147,7 @@ function indicator(run) {
     case "failure":     return "✘";
     case "in_progress": return "⋯";
     case "cancelled":   return "🛇";
+    case "skipped":     return "⭘";
     default:            return run.conclusion;
   }
 }
