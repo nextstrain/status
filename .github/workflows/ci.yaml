@@ -56,6 +56,9 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    # Timeout to prevent publish job from holding up updates
+    # <https://github.com/nextstrain/status/issues/42>
+    timeout-minutes: 1
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
