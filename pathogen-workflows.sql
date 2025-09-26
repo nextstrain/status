@@ -195,7 +195,7 @@ run_last_attempt as materialized (
         run.status,
         case when run.conclusion is not null
             then run.updated_at - run.created_at
-            else current_timestamp(0) - run.created_at
+            else date_trunc('second', statement_timestamp()) - run.created_at
         end                             as duration,
         run.event,
         run.head_sha                    as commit_id,
@@ -294,7 +294,7 @@ attempt as materialized (
         run.status,
         case when run.conclusion is not null
             then run.updated_at - run.created_at
-            else current_timestamp(0) - run.created_at
+            else date_trunc('second', statement_timestamp()) - run.created_at
         end                             as duration,
         run.event,
         run.head_sha                    as commit_id,
