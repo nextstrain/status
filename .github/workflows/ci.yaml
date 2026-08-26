@@ -29,7 +29,6 @@ jobs:
           steampipe --version
           steampipe plugin install github
           steampipe plugin install net
-          make -C steampipe-plugins/github
 
       - uses: actions/setup-node@v4
         with:
