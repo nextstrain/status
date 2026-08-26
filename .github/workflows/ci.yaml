@@ -36,7 +36,7 @@ jobs:
 
       - run: make --assume-old=favicon.svg --assume-old="favicon-[layer].svg.py"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_NEXTSTRAIN_BOT_REPO }}
         # Timeout the this step as a work-around for https://github.com/nextstrain/status/issues/5
         timeout-minutes: 15
 

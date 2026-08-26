@@ -87,13 +87,14 @@ with
 
 repository as materialized (
     select
-        r->>'full_name'         as repository_full_name,
-        r->>'default_branch'    as default_branch
+        name_with_owner                 as repository_full_name,
+        default_branch_ref ->> 'name'   as default_branch
     from
-        net_http_request,
-        jsonb_array_elements(response_body::jsonb) as r
+        github_search_repository
     where
-        url = 'https://api.github.com/orgs/nextstrain/repos?per_page=100&sort=full_name'
+        query = 'org:nextstrain archived:false'
+    order by
+        name_with_owner
 ),
 
 workflow_id as materialized (
