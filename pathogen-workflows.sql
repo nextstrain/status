@@ -53,7 +53,7 @@ set intervalstyle = 'iso_8601';
 -- Gigantic names to parallel the Steampipe table
 create or replace function github_actions_repository_workflow_runs_on_branch(
         _repository_full_name text,
-        _workflow_id text,
+        _workflow_id bigint,
         _head_branch text
     )
     returns setof github_actions_repository_workflow_run
@@ -144,7 +144,7 @@ workflow_id as materialized (
 workflow as materialized (
     select
         repository_full_name,
-        id::text    as workflow_id,
+        id          as workflow_id,
         path        as workflow_path,
         name        as workflow_name,
         html_url    as workflow_html_url
