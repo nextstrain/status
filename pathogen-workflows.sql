@@ -53,7 +53,7 @@ set intervalstyle = 'iso_8601';
 -- Gigantic names to parallel the Steampipe table
 create or replace function github_actions_repository_workflow_runs_on_branch(
         _repository_full_name text,
-        _workflow_id text,
+        _workflow_id bigint,
         _head_branch text
     )
     returns setof github_actions_repository_workflow_run
@@ -87,13 +87,14 @@ with
 
 repository as materialized (
     select
-        r->>'full_name'         as repository_full_name,
-        r->>'default_branch'    as default_branch
+        name_with_owner                 as repository_full_name,
+        default_branch_ref ->> 'name'   as default_branch
     from
-        net_http_request,
-        jsonb_array_elements(response_body::jsonb) as r
+        github_search_repository
     where
-        url = 'https://api.github.com/orgs/nextstrain/repos?per_page=100&sort=full_name'
+        query = 'org:nextstrain archived:false'
+    order by
+        name_with_owner
 ),
 
 workflow_id as materialized (
@@ -144,7 +145,7 @@ workflow_id as materialized (
 workflow as materialized (
     select
         repository_full_name,
-        id::text    as workflow_id,
+        id          as workflow_id,
         path        as workflow_path,
         name        as workflow_name,
         html_url    as workflow_html_url
