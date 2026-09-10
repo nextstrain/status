@@ -228,7 +228,6 @@ run_last_attempt as materialized (
          * ² <https://docs.github.com/en/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates>
          */
             age(run.created_at) <= '90 days'
-        and run.created_at >= '2024-02-13T21:50:28Z'::timestamptz -- When I merged <https://github.com/nextstrain/.github/pull/54>. —trs
 ),
 
 /* Filter to the last 30 runs.
