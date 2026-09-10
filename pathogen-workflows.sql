@@ -54,7 +54,8 @@ set intervalstyle = 'iso_8601';
 create or replace function github_actions_repository_workflow_runs_on_branch(
         _repository_full_name text,
         _workflow_id bigint,
-        _head_branch text
+        _head_branch text,
+        _created_on_and_after date
     )
     returns setof github_actions_repository_workflow_run
     language sql as $$
@@ -64,6 +65,7 @@ create or replace function github_actions_repository_workflow_runs_on_branch(
          where run.repository_full_name = _repository_full_name
            and run.workflow_id          = _workflow_id
            and run.head_branch          = _head_branch
+           and run.created_at          >= _created_on_and_after
     $$
 ;
 
@@ -215,19 +217,9 @@ run_last_attempt as materialized (
         github_actions_repository_workflow_runs_on_branch(
             repository_full_name,
             workflow_id,
-            (select default_branch from repository r where r.repository_full_name = workflow.repository_full_name)
+            (select default_branch from repository r where r.repository_full_name = workflow.repository_full_name),
+            current_date - 90
         ) as run
-
-    where
-        /* XXX TODO: Push created_at into the GitHub API call.  The API can
-         * handle created timesetamp¹ with operators = <> > >= < <=.²  This
-         * would avoid a bunch of pagination requests for the list call.
-         *   -trs, 18 Dec 2024
-         *
-         * ¹ <https://docs.github.com/en/rest/actions/workflow-runs?apiVersion=2022-11-28#list-workflow-runs-for-a-workflow>
-         * ² <https://docs.github.com/en/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates>
-         */
-            age(run.created_at) <= '90 days'
 ),
 
 /* Filter to the last 30 runs.
