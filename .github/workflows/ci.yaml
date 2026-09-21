@@ -36,6 +36,7 @@ jobs:
       - run: make --assume-old=favicon.svg --assume-old="favicon-[layer].svg.py"
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN_NEXTSTRAIN_BOT_REPO }}
+          STEAMPIPE_LOG_LEVEL: INFO
         # Timeout the this step as a work-around for https://github.com/nextstrain/status/issues/5
         timeout-minutes: 15
 
@@ -43,6 +44,12 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: build/
+
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: steampipe-logs
+          path: ~/.steampipe/logs/
 
   publish:
     needs: build
